@@ -65,3 +65,25 @@ describe 'Rufus::CronLine#next_time' do
 
 end
 
+describe 'Rufus::CronLine#previous_time' do
+
+  it 'should compute previous occurence correctly' do
+
+    now = Time.utc(2008, 01, 01, 0, 0, 0, 0) # Thu Jan 01 00:00:00 UTC 1970
+
+    cl('* * * * *').previous_time(now).should.equal(now - 60)
+    cl('* * * * sun').previous_time(now).should.equal(now - 172800)
+    cl('* * * * * *').previous_time(now).should.equal(now - 1)
+    cl('* * 13 * fri').previous_time(now).should.equal(now - 14774460)
+
+    cl('1 0 1 1 *').previous_time(now).should.equal(now - 31532400)
+      # this one is slow (1 year == 3 seconds)
+
+    cl('0 0 * * tue').previous_time(now).should.equal(now - 604800)
+
+    now = Time.local(2008, 12, 31, 0, 0, 1, 0)
+
+    cl('* * * * *').previous_time(now).should.equal(now - 1)
+  end
+
+end

@@ -150,6 +150,44 @@ module Rufus
       time
     end
 
+    #
+    # Returns the previous time that this cron line was supposed to 'fire'
+    #
+    # See also Rufus::CronLine#next_time for usage
+    #
+    def previous_time (time=Time.now)
+
+      time += time.usec * 1e-6
+      time -= 1
+
+      loop do
+
+        unless date_match?(time)
+          time -= (24 - time.hour) * 3600 - time.min * 60 - time.sec
+          next
+        end
+
+        unless sub_match?(time.hour, @hours)
+          time -= (60 - time.min) * 60 - time.sec
+          next
+        end
+
+        unless sub_match?(time.min, @minutes)
+          time -= 60 - time.sec
+          next
+        end
+
+        unless sub_match?(time.sec, @seconds)
+          time -= 1
+          next
+        end
+
+        break
+      end
+
+      time
+    end
+
     private
 
     WDS = %w[ sun mon tue wed thu fri sat ]
